@@ -61,14 +61,15 @@ function calculatePeaoMoves(
 
     // en passant
     if (lastMove) {
-      const { to } = lastMove;
+      const { from, to } = lastMove;
       const movedPiece = board[to.y][to.x];
 
       if (
         movedPiece &&
         movedPiece.color === "black" &&
         movedPiece.type === "peao" &&
-        to.y === y
+        to.y === y &&
+        from.y === 1
       ) {
         if (to.x === x - 1) {
           moves.push({ x: x - 1, y: y - 1, specialMove: "en_passant" });
@@ -99,14 +100,15 @@ function calculatePeaoMoves(
 
     // en passant
     if (lastMove) {
-      const { to } = lastMove;
+      const { from, to } = lastMove;
       const movedPiece = board[to.y][to.x];
 
       if (
         movedPiece &&
         movedPiece.color === "white" &&
         movedPiece.type === "peao" &&
-        to.y === y
+        to.y === y &&
+        from.y === 6
       ) {
         if (to.x === x - 1) {
           moves.push({ x: x - 1, y: y + 1, specialMove: "en_passant" });
