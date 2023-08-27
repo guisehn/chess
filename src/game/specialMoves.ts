@@ -8,9 +8,11 @@ export function maybeHandleSpecialMove(
   switch (move.specialMove) {
     case "castling":
       handleCastling(board, move);
+      break;
 
     case "en_passant":
       handleEnPassant(board, move, currentPlayer);
+      break;
   }
 }
 
