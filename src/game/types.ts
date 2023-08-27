@@ -2,7 +2,7 @@ export type Color = "black" | "white";
 
 export interface Piece {
   id: string;
-  type: "torre" | "cavalo" | "bispo" | "peao" | "rainha" | "rei";
+  type: "rook" | "knight" | "bishop" | "pawn" | "queen" | "king";
   color: Color;
   moved: boolean;
 }

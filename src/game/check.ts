@@ -9,7 +9,7 @@ import {
 
 export function isCheck(board: Board, color: Color) {
   const kingCoord = findCoordinate(
-    ({ x, y }) => board[y][x]?.type === "rei" && board[y][x]?.color === color
+    ({ x, y }) => board[y][x]?.type === "king" && board[y][x]?.color === color
   );
 
   if (!kingCoord) throw new Error("King not found");

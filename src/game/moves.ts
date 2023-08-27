@@ -1,5 +1,4 @@
 import { Board, Color, Coordinate, LogEntry, Move, Piece } from "./types";
-import { simulateMove } from "./utils";
 
 export function calculatePossibleMoves(
   board: Board,
@@ -9,30 +8,30 @@ export function calculatePossibleMoves(
   const selectedPiece = board[y][x]!;
 
   switch (selectedPiece.type) {
-    case "peao":
-      return calculatePeaoMoves(board, { x, y }, selectedPiece.color, log);
+    case "pawn":
+      return calculatePawnMoves(board, { x, y }, selectedPiece.color, log);
 
-    case "cavalo":
-      return calculateCavaloMoves(board, { x, y }, selectedPiece.color);
+    case "knight":
+      return calculateKnightMoves(board, { x, y }, selectedPiece.color);
 
-    case "torre":
-      return calculateTorreMoves(board, { x, y }, selectedPiece.color);
+    case "rook":
+      return calculateRookMoves(board, { x, y }, selectedPiece.color);
 
-    case "bispo":
-      return calculateBispoMoves(board, { x, y }, selectedPiece.color);
+    case "bishop":
+      return calculateBishopMoves(board, { x, y }, selectedPiece.color);
 
-    case "rainha":
-      return calculateRainhaMoves(board, { x, y }, selectedPiece.color);
+    case "queen":
+      return calculateQueenMoves(board, { x, y }, selectedPiece.color);
 
-    case "rei":
-      return calculateReiMoves(board, { x, y }, selectedPiece);
+    case "king":
+      return calculateKingMoves(board, { x, y }, selectedPiece);
 
     default:
       return [];
   }
 }
 
-function calculatePeaoMoves(
+function calculatePawnMoves(
   board: Board,
   { x, y }: Coordinate,
   color: Color,
@@ -67,7 +66,7 @@ function calculatePeaoMoves(
       if (
         movedPiece &&
         movedPiece.color === "black" &&
-        movedPiece.type === "peao" &&
+        movedPiece.type === "pawn" &&
         to.y === y &&
         from.y === 1
       ) {
@@ -106,7 +105,7 @@ function calculatePeaoMoves(
       if (
         movedPiece &&
         movedPiece.color === "white" &&
-        movedPiece.type === "peao" &&
+        movedPiece.type === "pawn" &&
         to.y === y &&
         from.y === 6
       ) {
@@ -122,7 +121,7 @@ function calculatePeaoMoves(
   return moves;
 }
 
-function calculateCavaloMoves(
+function calculateKnightMoves(
   board: Board,
   { x, y }: Coordinate,
   color: Color
@@ -147,7 +146,7 @@ function calculateCavaloMoves(
   );
 }
 
-function calculateTorreMoves(board: Board, { x, y }: Coordinate, color: Color) {
+function calculateRookMoves(board: Board, { x, y }: Coordinate, color: Color) {
   const moves: Coordinate[] = [];
 
   for (let yy = y - 1; yy >= 0; yy--) {
@@ -177,7 +176,11 @@ function calculateTorreMoves(board: Board, { x, y }: Coordinate, color: Color) {
   return moves;
 }
 
-function calculateBispoMoves(board: Board, { x, y }: Coordinate, color: Color) {
+function calculateBishopMoves(
+  board: Board,
+  { x, y }: Coordinate,
+  color: Color
+) {
   const moves: Coordinate[] = [];
 
   for (let xx = x - 1, yy = y - 1; xx >= 0 && yy >= 0; xx--, yy--) {
@@ -207,14 +210,14 @@ function calculateBispoMoves(board: Board, { x, y }: Coordinate, color: Color) {
   return moves;
 }
 
-function calculateRainhaMoves(board: Board, coord: Coordinate, color: Color) {
-  const torreMoves = calculateTorreMoves(board, coord, color);
-  const bispoMoves = calculateBispoMoves(board, coord, color);
+function calculateQueenMoves(board: Board, coord: Coordinate, color: Color) {
+  const rookMoves = calculateRookMoves(board, coord, color);
+  const bishopMoves = calculateBishopMoves(board, coord, color);
 
-  return torreMoves.concat(bispoMoves);
+  return rookMoves.concat(bishopMoves);
 }
 
-function calculateReiMoves(board: Board, { x, y }: Coordinate, piece: Piece) {
+function calculateKingMoves(board: Board, { x, y }: Coordinate, piece: Piece) {
   const moves: Move[] = [];
 
   moves.push({ x: x - 1, y: y - 1 });
@@ -234,7 +237,7 @@ function calculateReiMoves(board: Board, { x, y }: Coordinate, piece: Piece) {
     const leftRook = board[y][0];
     if (
       leftRook &&
-      leftRook.type === "torre" &&
+      leftRook.type === "rook" &&
       leftRook.color === piece.color &&
       !leftRook.moved &&
       !board[y][1] &&
@@ -247,7 +250,7 @@ function calculateReiMoves(board: Board, { x, y }: Coordinate, piece: Piece) {
     const rightRook = board[y][7];
     if (
       rightRook &&
-      rightRook.type === "torre" &&
+      rightRook.type === "rook" &&
       rightRook.color === piece.color &&
       !rightRook.moved &&
       !board[y][5] &&
