@@ -18,8 +18,9 @@ export function buildInitialState(): GameState {
 }
 
 // TODO: impedir roque
-// TODO: cravada
-// TODO: transformar peão em outra peça qdo chega no final do tabuleiro
+// TODO: transformar peão em outra peça quando chega no final do tabuleiro
+// TODO: empate por afogamento
+// TODO: empate se tiver apenas rei contra rei, empate se tiver apenas cavalo e rei, empate se tiver apenas bispo e rei, empate
 
 export function play(state: GameState, { x, y }: Coordinate) {
   return produce(state, (state) => {
@@ -45,12 +46,11 @@ function selectPiece(state: GameState, { x, y }: Coordinate) {
     state.log
   );
 
-  if (isCheck(state.board, state.currentPlayer)) {
-    state.possibleMoves = state.possibleMoves.filter((move) => {
-      const simulatedBoard = simulateMove(state.board, { x, y }, move);
-      return !isCheck(simulatedBoard, state.currentPlayer);
-    });
-  }
+  // Pin logic
+  state.possibleMoves = state.possibleMoves.filter((move) => {
+    const simulatedBoard = simulateMove(state.board, { x, y }, move);
+    return !isCheck(simulatedBoard, state.currentPlayer);
+  });
 }
 
 function doPlay(state: GameState, to: Coordinate) {

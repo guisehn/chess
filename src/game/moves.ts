@@ -1,9 +1,12 @@
+import { isCheck } from "./check";
 import { Board, Color, Coordinate, LogEntry, Move, Piece } from "./types";
+import { findCoordinates, hasCoordinate } from "./utils";
 
 export function calculatePossibleMoves(
   board: Board,
   { x, y }: Coordinate,
-  log: LogEntry[]
+  log: LogEntry[],
+  nestedCalculation: boolean = false
 ): Move[] {
   const selectedPiece = board[y][x]!;
 
@@ -24,7 +27,12 @@ export function calculatePossibleMoves(
       return calculateQueenMoves(board, { x, y }, selectedPiece.color);
 
     case "king":
-      return calculateKingMoves(board, { x, y }, selectedPiece);
+      return calculateKingMoves(
+        board,
+        { x, y },
+        selectedPiece,
+        nestedCalculation
+      );
 
     default:
       return [];
@@ -217,7 +225,12 @@ function calculateQueenMoves(board: Board, coord: Coordinate, color: Color) {
   return rookMoves.concat(bishopMoves);
 }
 
-function calculateKingMoves(board: Board, { x, y }: Coordinate, piece: Piece) {
+function calculateKingMoves(
+  board: Board,
+  { x, y }: Coordinate,
+  piece: Piece,
+  nestedCalculation: boolean
+) {
   const moves: Move[] = [];
 
   moves.push({ x: x - 1, y: y - 1 });
@@ -233,7 +246,15 @@ function calculateKingMoves(board: Board, { x, y }: Coordinate, piece: Piece) {
 
   // TODO: se tiver em check, não pode
   // TODO: se tiver peça ameaçando, não pode
-  if (!piece.moved) {
+  if (!nestedCalculation && !piece.moved) {
+    const opponentCoords = findCoordinates(
+      ({ x, y }) => board[y][x] !== null && board[y][x]!.color !== piece.color
+    );
+
+    const allOpponentMoves = opponentCoords
+      .map((coord) => calculatePossibleMoves(board, coord, [], true))
+      .flat();
+
     const leftRook = board[y][0];
     if (
       leftRook &&
@@ -242,8 +263,12 @@ function calculateKingMoves(board: Board, { x, y }: Coordinate, piece: Piece) {
       !leftRook.moved &&
       !board[y][1] &&
       !board[y][2] &&
-      !board[y][3]
+      !board[y][3] &&
+      !hasCoordinate(allOpponentMoves, { x: 1, y }) &&
+      !hasCoordinate(allOpponentMoves, { x: 2, y }) &&
+      !hasCoordinate(allOpponentMoves, { x: 3, y })
     ) {
+      console.log("left rook!");
       moves.push({ x: 2, y, specialMove: "castling" });
     }
 
@@ -254,7 +279,9 @@ function calculateKingMoves(board: Board, { x, y }: Coordinate, piece: Piece) {
       rightRook.color === piece.color &&
       !rightRook.moved &&
       !board[y][5] &&
-      !board[y][6]
+      !board[y][6] &&
+      !hasCoordinate(allOpponentMoves, { x: 5, y }) &&
+      !hasCoordinate(allOpponentMoves, { x: 6, y })
     ) {
       moves.push({ x: 6, y, specialMove: "castling" });
     }
