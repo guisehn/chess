@@ -29,3 +29,17 @@ export interface LogEntry {
 }
 
 export type Move = Coordinate & { specialMove?: "castling" | "en_passant" };
+
+export type PieceChar =
+  | "♗"
+  | "♝"
+  | "♚"
+  | "♔"
+  | "♞"
+  | "♘"
+  | "♟"
+  | "♙"
+  | "♛"
+  | "♕"
+  | "♜"
+  | "♖";
