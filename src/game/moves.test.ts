@@ -81,6 +81,32 @@ describe("calculatePossibleMoves", () => {
         });
       });
 
+      it("cannot move over other pieces", () => {
+        expectMoves({
+          pieceCoord: { x: 3, y: 1 },
+          board: `
+          ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
+          ♟ ♟ ♟ ♟ ♟ ♟ ♟ ♟
+          . . . ♙ . . . .
+          . . . . . . . .
+          . . . . . . . .
+          . . . . . . . .
+          ♙ ♙ ♙ . ♙ ♙ ♙ ♙
+          ♖ ♘ ♗ ♕ ♔ ♗ ♘ ♖
+          `,
+          expectedBoard: `
+          ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
+          ♟ ♟ ♟ ♟ ♟ ♟ ♟ ♟
+          . . . ♙ . . . .
+          . . . . . . . .
+          . . . . . . . .
+          . . . . . . . .
+          ♙ ♙ ♙ . ♙ ♙ ♙ ♙
+          ♖ ♘ ♗ ♕ ♔ ♗ ♘ ♖
+          `,
+        });
+      });
+
       it("allows killing opponent on diagonals", () => {
         expectMoves({
           pieceCoord: { x: 3, y: 2 },
