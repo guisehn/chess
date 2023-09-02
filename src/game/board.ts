@@ -2,14 +2,15 @@ import { Board } from "./types";
 import { stringToBoard } from "./utils";
 
 export const initialBoard: Board = stringToBoard(`
-♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
-♟ ♟ ♟ ♟ ♟ ♟ ♟ ♟
-. . . . . . . .
-. . . . . . . .
-. . . . . . . .
-. . . . . . . .
-♙ ♙ ♙ ♙ ♙ ♙ ♙ ♙
-♖ ♘ ♗ ♕ ♔ ♗ ♘ ♖
+8 ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
+7 ♟ ♟ ♟ ♟ ♟ ♟ ♟ ♟
+6 . . . . . . . .
+5 . . . . . . . .
+4 . . . . . . . .
+3 . . . . . . . .
+2 ♙ ♙ ♙ ♙ ♙ ♙ ♙ ♙
+1 ♖ ♘ ♗ ♕ ♔ ♗ ♘ ♖
+  a b c d e f g h
 `);
 
 // Board can also be mounted manually.

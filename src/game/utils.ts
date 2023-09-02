@@ -57,19 +57,23 @@ export function simulateMove(board: Board, from: Coordinate, to: Coordinate) {
 }
 
 export function stateToBoardString(state: GameState) {
-  return state.board
-    .map((row, y) => {
-      return row
-        .map((value, x) => {
-          if (hasCoordinate(state.possibleMoves, { x, y })) return "x";
+  return (
+    state.board
+      .map((row, y) => {
+        const line = row
+          .map((value, x) => {
+            if (hasCoordinate(state.possibleMoves, { x, y })) return "x";
 
-          if (!value) return ".";
+            if (!value) return ".";
 
-          return pieceToChar(value);
-        })
-        .join(" ");
-    })
-    .join("\n");
+            return pieceToChar(value);
+          })
+          .join(" ");
+
+        return `${8 - y} ${line}`;
+      })
+      .join("\n") + "\n  a b c d e f g h"
+  );
 }
 
 export function stringToBoard(str: string): Board {
@@ -80,7 +84,7 @@ export function stringToBoard(str: string): Board {
     const row: (Piece | null)[] = [];
     const line = (lines[y] ?? "").trim().split(" ");
 
-    for (let x = 0; x < 8; x++) {
+    for (let x = 1; x <= 8; x++) {
       row.push(charToPiece((line[x] || ".") as PieceChar | "."));
     }
 
@@ -139,3 +143,5 @@ function pieceToChar(piece: Piece): PieceChar {
       return piece.color === "black" ? "♜" : "♖";
   }
 }
+
+// if (typeof window != "undefined") (window as any).stringToBoard = stringToBoard;
