@@ -4,7 +4,7 @@ import { flushSync } from "react-dom";
 
 import Image from "next/image";
 import { Coordinate, GameState, Piece } from "@/game/types";
-import { hasCoordinate, isSameCoordinate } from "@/game/utils";
+import { coordToString, hasCoordinate, isSameCoordinate } from "@/game/utils";
 import { buildInitialState, play } from "@/game/game";
 import { isCheck, isCheckMate } from "@/game/check";
 

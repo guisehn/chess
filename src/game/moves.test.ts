@@ -1,13 +1,19 @@
 import { calculatePossibleMoves } from "./moves";
-import { Board, Coordinate, GameState, LogEntry } from "./types";
-import { stateToBoardString, stringToBoard } from "./utils";
+import {
+  Board,
+  Coordinate,
+  CoordinateString,
+  GameState,
+  LogEntry,
+} from "./types";
+import { stateToBoardString, stringToBoard, stringToCoord } from "./utils";
 
 describe("calculatePossibleMoves", () => {
   describe("pawn", () => {
     describe("black", () => {
       it("allows moving two tiles on first play", () => {
         expectMoves({
-          pieceCoord: { x: 3, y: 1 },
+          pieceCoord: "d7",
           board: `
             8 ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
             7 ♟ ♟ ♟ ♟ ♟ ♟ ♟ ♟
@@ -35,7 +41,7 @@ describe("calculatePossibleMoves", () => {
 
       it("allows moving one tile on second play", () => {
         expectMoves({
-          pieceCoord: { x: 3, y: 2 },
+          pieceCoord: "d6",
           board: `
             8 ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
             7 ♟ ♟ ♟ . ♟ ♟ ♟ ♟
@@ -61,7 +67,7 @@ describe("calculatePossibleMoves", () => {
         });
 
         expectMoves({
-          pieceCoord: { x: 3, y: 3 },
+          pieceCoord: "d5",
           board: `
             8 ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
             7 ♟ ♟ ♟ . ♟ ♟ ♟ ♟
@@ -89,7 +95,7 @@ describe("calculatePossibleMoves", () => {
 
       it("cannot move over other pieces", () => {
         expectMoves({
-          pieceCoord: { x: 3, y: 1 },
+          pieceCoord: "d7",
           board: `
             8 ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
             7 ♟ ♟ ♟ ♟ ♟ ♟ ♟ ♟
@@ -117,7 +123,7 @@ describe("calculatePossibleMoves", () => {
 
       it("allows killing opponent on diagonals", () => {
         expectMoves({
-          pieceCoord: { x: 3, y: 2 },
+          pieceCoord: "d6",
           board: `
             8 ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
             7 ♟ ♟ ♙ . ♙ ♟ ♟ ♟
@@ -146,7 +152,7 @@ describe("calculatePossibleMoves", () => {
       it("allows en passant when pawn of opponent next to your piece has just moved 2 tiles", () => {
         // En passant allowed (left)
         expectMoves({
-          pieceCoord: { x: 3, y: 4 },
+          pieceCoord: "d4",
           log: [
             { from: { x: 0, y: 6 }, to: { x: 0, y: 5 } },
             { from: { x: 3, y: 1 }, to: { x: 3, y: 3 } },
@@ -181,7 +187,7 @@ describe("calculatePossibleMoves", () => {
 
         // En passant allowed (right)
         expectMoves({
-          pieceCoord: { x: 3, y: 4 },
+          pieceCoord: "d4",
           log: [
             { from: { x: 0, y: 6 }, to: { x: 0, y: 5 } },
             { from: { x: 3, y: 1 }, to: { x: 3, y: 3 } },
@@ -216,7 +222,7 @@ describe("calculatePossibleMoves", () => {
 
         // En passant not allowed (opponent's pawn move was not the last move)
         expectMoves({
-          pieceCoord: { x: 3, y: 4 },
+          pieceCoord: "d4",
           log: [
             { from: { x: 4, y: 6 }, to: { x: 4, y: 4 } },
             { from: { x: 0, y: 6 }, to: { x: 0, y: 5 } },
@@ -255,7 +261,7 @@ describe("calculatePossibleMoves", () => {
   describe("knight", () => {
     it("calculates moves correctly", () => {
       expectMoves({
-        pieceCoord: { x: 3, y: 4 },
+        pieceCoord: "d4",
         board: `
           8 . . . . . . . .
           7 . . . . . . . .
@@ -283,7 +289,7 @@ describe("calculatePossibleMoves", () => {
 
     it("allows moving over opponent pieces", () => {
       expectMoves({
-        pieceCoord: { x: 3, y: 4 },
+        pieceCoord: "d4",
         board: `
           8 . . . . . . . .
           7 . . . . . . . .
@@ -311,7 +317,7 @@ describe("calculatePossibleMoves", () => {
 
     it("does not allow moving over own pieces", () => {
       expectMoves({
-        pieceCoord: { x: 3, y: 4 },
+        pieceCoord: "d4",
         board: `
           8 . . . . . . . .
           7 . . . . . . . .
@@ -357,14 +363,18 @@ function expectMoves({
   expectedBoard: expectedBoardString,
   log,
 }: {
-  pieceCoord: Coordinate;
+  pieceCoord: CoordinateString;
   board: string;
   expectedBoard: string;
   log?: LogEntry[];
 }) {
   const board = stringToBoard(boardString);
 
-  const possibleMoves = calculatePossibleMoves(board, pieceCoord, { log });
+  const possibleMoves = calculatePossibleMoves(
+    board,
+    stringToCoord(pieceCoord),
+    { log }
+  );
 
   const state = boardToState(board, { possibleMoves });
 

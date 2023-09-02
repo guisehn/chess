@@ -1,4 +1,11 @@
-import { Board, Coordinate, GameState, Piece, PieceChar } from "./types";
+import {
+  Board,
+  Coordinate,
+  CoordinateString,
+  GameState,
+  Piece,
+  PieceChar,
+} from "./types";
 
 const makeId = (() => {
   let n = 0;
@@ -144,4 +151,12 @@ function pieceToChar(piece: Piece): PieceChar {
   }
 }
 
-// if (typeof window != "undefined") (window as any).stringToBoard = stringToBoard;
+export function coordToString(coord: Coordinate): CoordinateString {
+  return ("abcdefgh"[coord.x] + (8 - coord.y)) as CoordinateString;
+}
+
+export function stringToCoord(str: CoordinateString): Coordinate {
+  const x = str.charCodeAt(0) - 97; // 97 = charcode for "a"
+  const y = 8 - Number(str[1]);
+  return { x, y };
+}
