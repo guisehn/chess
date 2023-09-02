@@ -1,15 +1,16 @@
-import { isCheck } from "./check";
 import { Board, Color, Coordinate, LogEntry, Move, Piece } from "./types";
 import { findCoordinates, hasCoordinate } from "./utils";
 
 export function calculatePossibleMoves(
   board: Board,
   pieceCoord: Coordinate,
-  log: LogEntry[],
+  log?: LogEntry[],
   nestedCalculation: boolean = false
 ): Move[] {
   const { x, y } = pieceCoord;
-  const selectedPiece = board[y][x]!;
+  const selectedPiece = board[y][x];
+
+  if (!selectedPiece) throw new Error(`No player at ${x}, ${y}`);
 
   switch (selectedPiece.type) {
     case "pawn":
@@ -44,10 +45,9 @@ function calculatePawnMoves(
   board: Board,
   { x, y }: Coordinate,
   color: Color,
-  log: LogEntry[]
+  log?: LogEntry[]
 ) {
   const moves: Move[] = [];
-  const lastMove: LogEntry | undefined = log[log.length - 1];
 
   if (color === "white") {
     if (board[y - 1][x] === null) moves.push({ x, y: y - 1 });
@@ -68,7 +68,8 @@ function calculatePawnMoves(
     }
 
     // en passant
-    if (lastMove) {
+    if (y === 3 && log) {
+      const lastMove: LogEntry = log[log.length - 1];
       const { from, to } = lastMove;
       const movedPiece = board[to.y][to.x];
 
@@ -76,7 +77,7 @@ function calculatePawnMoves(
         movedPiece &&
         movedPiece.color === "black" &&
         movedPiece.type === "pawn" &&
-        to.y === y &&
+        to.y === 3 &&
         from.y === 1
       ) {
         if (to.x === x - 1) {
@@ -107,7 +108,8 @@ function calculatePawnMoves(
     }
 
     // en passant
-    if (lastMove) {
+    if (y === 4 && log) {
+      const lastMove: LogEntry = log[log.length - 1];
       const { from, to } = lastMove;
       const movedPiece = board[to.y][to.x];
 
@@ -115,7 +117,7 @@ function calculatePawnMoves(
         movedPiece &&
         movedPiece.color === "white" &&
         movedPiece.type === "pawn" &&
-        to.y === y &&
+        to.y === 4 &&
         from.y === 6
       ) {
         if (to.x === x - 1) {
@@ -247,46 +249,46 @@ function calculateKingMoves(
 
   // TODO: se tiver em check, não pode
   // TODO: se tiver peça ameaçando, não pode
-  if (!nestedCalculation && !piece.moved) {
-    const opponentCoords = findCoordinates(
-      ({ x, y }) => board[y][x] !== null && board[y][x]!.color !== piece.color
-    );
+  // if (!nestedCalculation && !piece.moved) {
+  //   const opponentCoords = findCoordinates(
+  //     ({ x, y }) => board[y][x] !== null && board[y][x]!.color !== piece.color
+  //   );
 
-    const allOpponentMoves = opponentCoords
-      .map((coord) => calculatePossibleMoves(board, coord, [], true))
-      .flat();
+  //   const allOpponentMoves = opponentCoords
+  //     .map((coord) => calculatePossibleMoves(board, coord, [], true))
+  //     .flat();
 
-    const leftRook = board[y][0];
-    if (
-      leftRook &&
-      leftRook.type === "rook" &&
-      leftRook.color === piece.color &&
-      !leftRook.moved &&
-      !board[y][1] &&
-      !board[y][2] &&
-      !board[y][3] &&
-      !hasCoordinate(allOpponentMoves, { x: 1, y }) &&
-      !hasCoordinate(allOpponentMoves, { x: 2, y }) &&
-      !hasCoordinate(allOpponentMoves, { x: 3, y })
-    ) {
-      console.log("left rook!");
-      moves.push({ x: 2, y, specialMove: "castling" });
-    }
+  //   const leftRook = board[y][0];
+  //   if (
+  //     leftRook &&
+  //     leftRook.type === "rook" &&
+  //     leftRook.color === piece.color &&
+  //     !leftRook.moved &&
+  //     !board[y][1] &&
+  //     !board[y][2] &&
+  //     !board[y][3] &&
+  //     !hasCoordinate(allOpponentMoves, { x: 1, y }) &&
+  //     !hasCoordinate(allOpponentMoves, { x: 2, y }) &&
+  //     !hasCoordinate(allOpponentMoves, { x: 3, y })
+  //   ) {
+  //     console.log("left rook!");
+  //     moves.push({ x: 2, y, specialMove: "castling" });
+  //   }
 
-    const rightRook = board[y][7];
-    if (
-      rightRook &&
-      rightRook.type === "rook" &&
-      rightRook.color === piece.color &&
-      !rightRook.moved &&
-      !board[y][5] &&
-      !board[y][6] &&
-      !hasCoordinate(allOpponentMoves, { x: 5, y }) &&
-      !hasCoordinate(allOpponentMoves, { x: 6, y })
-    ) {
-      moves.push({ x: 6, y, specialMove: "castling" });
-    }
-  }
+  //   const rightRook = board[y][7];
+  //   if (
+  //     rightRook &&
+  //     rightRook.type === "rook" &&
+  //     rightRook.color === piece.color &&
+  //     !rightRook.moved &&
+  //     !board[y][5] &&
+  //     !board[y][6] &&
+  //     !hasCoordinate(allOpponentMoves, { x: 5, y }) &&
+  //     !hasCoordinate(allOpponentMoves, { x: 6, y })
+  //   ) {
+  //     moves.push({ x: 6, y, specialMove: "castling" });
+  //   }
+  // }
 
   // só pode mover se a casa estiver vazia, ou se houver uma peça de outra cor (mata ela)
   return moves.filter(

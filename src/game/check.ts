@@ -21,7 +21,7 @@ export function isCheck(board: Board, color: Color) {
   for (const pieceCoord of opponentCoords) {
     // TODO: preciso passar log entry aqui? só preciso se um en passant pudesse
     // salvar de um check
-    const moves = calculatePossibleMoves(board, pieceCoord, []);
+    const moves = calculatePossibleMoves(board, pieceCoord);
 
     if (hasCoordinate(moves, kingCoord)) {
       return true;
@@ -41,7 +41,7 @@ export function isCheckMate(board: Board, color: Color) {
   for (const pieceCoord of myCoords) {
     // TODO: preciso passar log entry aqui? só preciso se um en passant pudesse
     // salvar de um check
-    const moves = calculatePossibleMoves(board, pieceCoord, []);
+    const moves = calculatePossibleMoves(board, pieceCoord);
 
     for (const move of moves) {
       const simulatedBoard = simulateMove(board, pieceCoord, move);

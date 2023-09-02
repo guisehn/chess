@@ -36,11 +36,14 @@ export default function Chess() {
           {state.board.map((row, y) => (
             <div
               key={y}
-              className={classNames("grid grid-cols-8 bg-yellow-400", {
+              className={classNames("grid grid-cols-9 bg-yellow-400", {
                 "[&>*:nth-child(even)]:bg-yellow-600": y % 2 === 0,
                 "[&>*:nth-child(odd)]:bg-yellow-600": y % 2 !== 0,
               })}
             >
+              <div className="!bg-white justify-end items-center flex p-4 text-xs">
+                {8 - y}
+              </div>
               {row.map((piece, x) => (
                 <div
                   key={x}
@@ -61,7 +64,7 @@ export default function Chess() {
                   )}
                   onClick={() => handleTileClick({ x, y })}
                 >
-                  <div className="absolute top-1 left-1 text-xs">
+                  <div className="absolute top-1 left-1 text-xs opacity-30">
                     {x},{y}
                   </div>
                   {piece && <Piece piece={piece} />}
@@ -69,6 +72,17 @@ export default function Chess() {
               ))}
             </div>
           ))}
+          <div className="grid grid-cols-9 text-xs [&>div]:p-2 [&>div]:text-center">
+            <div></div>
+            <div>a</div>
+            <div>b</div>
+            <div>c</div>
+            <div>d</div>
+            <div>e</div>
+            <div>f</div>
+            <div>g</div>
+            <div>h</div>
+          </div>
         </div>
       </div>
       <div>
