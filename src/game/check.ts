@@ -1,5 +1,5 @@
 import { calculatePossibleMoves } from "./moves";
-import { Board, Color, Coordinate } from "./types";
+import { Board, Color } from "./types";
 import {
   findCoordinate,
   findCoordinates,

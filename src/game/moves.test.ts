@@ -1,11 +1,5 @@
 import { calculatePossibleMoves } from "./moves";
-import {
-  Board,
-  Coordinate,
-  CoordinateString,
-  GameState,
-  LogEntry,
-} from "./types";
+import { Board, CoordinateString, GameState, LogEntry } from "./types";
 import { stateToBoardString, stringToBoard, stringToCoord } from "./utils";
 
 describe("calculatePossibleMoves", () => {

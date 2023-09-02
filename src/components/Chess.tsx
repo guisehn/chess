@@ -86,11 +86,6 @@ export default function Chess() {
         </div>
       </div>
       <div>
-        IS CHECK? {JSON.stringify(isCheck(state.board, state.currentPlayer))}
-        <br />
-        IS CHECK MATE?{" "}
-        {JSON.stringify(isCheckMate(state.board, state.currentPlayer))}
-        <br />
         <pre>{JSON.stringify(state, null, 2)}</pre>
       </div>
     </div>

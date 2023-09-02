@@ -1,51 +1,77 @@
+import { isCheck } from "./check";
 import { Board, Color, Coordinate, LogEntry, Move, Piece } from "./types";
-import { findCoordinates, hasCoordinate } from "./utils";
+import { findCoordinates, hasCoordinate, simulateMove } from "./utils";
 
 /**
  * Calculate possible moves for a piece on the board.
  * Options:
  * - log: used for en passant calculation
  * - nestedCalculation: prevents infinite loop on castling calculation
+ * - preventCheck: prevent moves that cause player to be or remain checked
  */
 export function calculatePossibleMoves(
   board: Board,
   pieceCoord: Coordinate,
-  options?: { log?: LogEntry[]; nestedCalculation?: boolean }
+  options?: {
+    log?: LogEntry[];
+    nestedCalculation?: boolean;
+    preventCheck?: boolean;
+  }
 ): Move[] {
-  const { log, nestedCalculation = false } = options ?? {};
+  const {
+    log,
+    nestedCalculation = false,
+    preventCheck = false,
+  } = options ?? {};
 
   const { x, y } = pieceCoord;
   const selectedPiece = board[y][x];
-
   if (!selectedPiece) throw new Error(`No player at ${x}, ${y}`);
+
+  let moves: Move[];
 
   switch (selectedPiece.type) {
     case "pawn":
-      return calculatePawnMoves(board, { x, y }, selectedPiece.color, log);
+      moves = calculatePawnMoves(board, { x, y }, selectedPiece.color, log);
+      break;
 
     case "knight":
-      return calculateKnightMoves(board, { x, y }, selectedPiece.color);
+      moves = calculateKnightMoves(board, { x, y }, selectedPiece.color);
+      break;
 
     case "rook":
-      return calculateRookMoves(board, { x, y }, selectedPiece.color);
+      moves = calculateRookMoves(board, { x, y }, selectedPiece.color);
+      break;
 
     case "bishop":
-      return calculateBishopMoves(board, { x, y }, selectedPiece.color);
+      moves = calculateBishopMoves(board, { x, y }, selectedPiece.color);
+      break;
 
     case "queen":
-      return calculateQueenMoves(board, { x, y }, selectedPiece.color);
+      moves = calculateQueenMoves(board, { x, y }, selectedPiece.color);
+      break;
 
     case "king":
-      return calculateKingMoves(
+      moves = calculateKingMoves(
         board,
         { x, y },
         selectedPiece,
         nestedCalculation
       );
+      break;
 
     default:
-      return [];
+      moves = [];
   }
+
+  if (preventCheck) {
+    moves = moves.filter((move) => {
+      const simulatedBoard = simulateMove(board, { x, y }, move);
+      return !isCheck(simulatedBoard, selectedPiece.color);
+    });
+  }
+
+  return moves;
 }
 
 function calculatePawnMoves(

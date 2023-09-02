@@ -43,14 +43,8 @@ function selectPiece(state: GameState, { x, y }: Coordinate) {
   state.possibleMoves = calculatePossibleMoves(
     state.board,
     state.selectedPiece,
-    { log: state.log }
+    { log: state.log, preventCheck: true }
   );
-
-  // Pin logic
-  state.possibleMoves = state.possibleMoves.filter((move) => {
-    const simulatedBoard = simulateMove(state.board, { x, y }, move);
-    return !isCheck(simulatedBoard, state.currentPlayer);
-  });
 }
 
 function doPlay(state: GameState, to: Coordinate) {
