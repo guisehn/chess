@@ -4,10 +4,11 @@ import { findCoordinates, hasCoordinate } from "./utils";
 
 export function calculatePossibleMoves(
   board: Board,
-  { x, y }: Coordinate,
+  pieceCoord: Coordinate,
   log: LogEntry[],
   nestedCalculation: boolean = false
 ): Move[] {
+  const { x, y } = pieceCoord;
   const selectedPiece = board[y][x]!;
 
   switch (selectedPiece.type) {
