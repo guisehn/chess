@@ -316,7 +316,7 @@ function expectMoves({
 }) {
   const board = stringToBoard(boardString);
 
-  const possibleMoves = calculatePossibleMoves(board, pieceCoord, log ?? []);
+  const possibleMoves = calculatePossibleMoves(board, pieceCoord, { log });
 
   const state = boardToState(board, { possibleMoves });
 

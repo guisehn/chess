@@ -1,12 +1,19 @@
 import { Board, Color, Coordinate, LogEntry, Move, Piece } from "./types";
 import { findCoordinates, hasCoordinate } from "./utils";
 
+/**
+ * Calculate possible moves for a piece on the board.
+ * Options:
+ * - log: used for en passant calculation
+ * - nestedCalculation: prevents infinite loop on castling calculation
+ */
 export function calculatePossibleMoves(
   board: Board,
   pieceCoord: Coordinate,
-  log?: LogEntry[],
-  nestedCalculation: boolean = false
+  options?: { log?: LogEntry[]; nestedCalculation?: boolean }
 ): Move[] {
+  const { log, nestedCalculation = false } = options ?? {};
+
   const { x, y } = pieceCoord;
   const selectedPiece = board[y][x];
 
@@ -248,47 +255,47 @@ function calculateKingMoves(
   moves.push({ x: x + 1, y: y + 1 });
 
   // TODO: se tiver em check, não pode
-  // TODO: se tiver peça ameaçando, não pode
-  // if (!nestedCalculation && !piece.moved) {
-  //   const opponentCoords = findCoordinates(
-  //     ({ x, y }) => board[y][x] !== null && board[y][x]!.color !== piece.color
-  //   );
+  if (!nestedCalculation && !piece.moved) {
+    const opponentCoords = findCoordinates(
+      ({ x, y }) => board[y][x] !== null && board[y][x]!.color !== piece.color
+    );
 
-  //   const allOpponentMoves = opponentCoords
-  //     .map((coord) => calculatePossibleMoves(board, coord, [], true))
-  //     .flat();
+    const allOpponentMoves = opponentCoords
+      .map((coord) =>
+        calculatePossibleMoves(board, coord, { nestedCalculation: true })
+      )
+      .flat();
 
-  //   const leftRook = board[y][0];
-  //   if (
-  //     leftRook &&
-  //     leftRook.type === "rook" &&
-  //     leftRook.color === piece.color &&
-  //     !leftRook.moved &&
-  //     !board[y][1] &&
-  //     !board[y][2] &&
-  //     !board[y][3] &&
-  //     !hasCoordinate(allOpponentMoves, { x: 1, y }) &&
-  //     !hasCoordinate(allOpponentMoves, { x: 2, y }) &&
-  //     !hasCoordinate(allOpponentMoves, { x: 3, y })
-  //   ) {
-  //     console.log("left rook!");
-  //     moves.push({ x: 2, y, specialMove: "castling" });
-  //   }
+    const leftRook = board[y][0];
+    if (
+      leftRook &&
+      leftRook.type === "rook" &&
+      leftRook.color === piece.color &&
+      !leftRook.moved &&
+      !board[y][1] &&
+      !board[y][2] &&
+      !board[y][3] &&
+      !hasCoordinate(allOpponentMoves, { x: 1, y }) &&
+      !hasCoordinate(allOpponentMoves, { x: 2, y }) &&
+      !hasCoordinate(allOpponentMoves, { x: 3, y })
+    ) {
+      moves.push({ x: 2, y, specialMove: "castling" });
+    }
 
-  //   const rightRook = board[y][7];
-  //   if (
-  //     rightRook &&
-  //     rightRook.type === "rook" &&
-  //     rightRook.color === piece.color &&
-  //     !rightRook.moved &&
-  //     !board[y][5] &&
-  //     !board[y][6] &&
-  //     !hasCoordinate(allOpponentMoves, { x: 5, y }) &&
-  //     !hasCoordinate(allOpponentMoves, { x: 6, y })
-  //   ) {
-  //     moves.push({ x: 6, y, specialMove: "castling" });
-  //   }
-  // }
+    const rightRook = board[y][7];
+    if (
+      rightRook &&
+      rightRook.type === "rook" &&
+      rightRook.color === piece.color &&
+      !rightRook.moved &&
+      !board[y][5] &&
+      !board[y][6] &&
+      !hasCoordinate(allOpponentMoves, { x: 5, y }) &&
+      !hasCoordinate(allOpponentMoves, { x: 6, y })
+    ) {
+      moves.push({ x: 6, y, specialMove: "castling" });
+    }
+  }
 
   // só pode mover se a casa estiver vazia, ou se houver uma peça de outra cor (mata ela)
   return moves.filter(

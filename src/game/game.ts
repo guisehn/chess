@@ -43,7 +43,7 @@ function selectPiece(state: GameState, { x, y }: Coordinate) {
   state.possibleMoves = calculatePossibleMoves(
     state.board,
     state.selectedPiece,
-    state.log
+    { log: state.log }
   );
 
   // Pin logic
