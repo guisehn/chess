@@ -338,7 +338,7 @@ describe("calculatePossibleMoves", () => {
     });
   });
 
-  describe("hook", () => {
+  describe("rook", () => {
     it("calculates moves correctly", () => {
       expectMoves({
         pieceCoord: "d4",
@@ -417,6 +417,92 @@ describe("calculatePossibleMoves", () => {
           4 . ♙ x ♖ x ♙ . .
           3 . . . x . . . .
           2 . . . ♙ . . . .
+          1 . . . . . . . .
+            a b c d e f g h
+        `,
+      });
+    });
+  });
+
+  describe("bishop", () => {
+    it("calculates moves correctly", () => {
+      expectMoves({
+        pieceCoord: "d4",
+        board: `
+          8 . . . . . . . .
+          7 . . . . . . . .
+          6 . . . . . . . .
+          5 . . . . . . . .
+          4 . . . ♗ . . . .
+          3 . . . . . . . .
+          2 . . . . . . . .
+          1 . . . . . . . .
+            a b c d e f g h
+        `,
+        expectedBoard: `
+          8 . . . . . . . x
+          7 x . . . . . x .
+          6 . x . . . x . .
+          5 . . x . x . . .
+          4 . . . ♗ . . . .
+          3 . . x . x . . .
+          2 . x . . . x . .
+          1 x . . . . . x .
+            a b c d e f g h
+        `,
+      });
+    });
+
+    it("allows moving over opponent pieces", () => {
+      expectMoves({
+        pieceCoord: "d4",
+        board: `
+          8 . . . . . . . .
+          7 . . . . . . . .
+          6 . ♟ . . . ♟ . .
+          5 . . . . . . . .
+          4 . . . ♗ . . . .
+          3 . . . . . . . .
+          2 . ♟ . . . ♟ . .
+          1 . . . . . . . .
+            a b c d e f g h
+        `,
+        expectedBoard: `
+          8 . . . . . . . .
+          7 . . . . . . . .
+          6 . x . . . x . .
+          5 . . x . x . . .
+          4 . . . ♗ . . . .
+          3 . . x . x . . .
+          2 . x . . . x . .
+          1 . . . . . . . .
+            a b c d e f g h
+        `,
+      });
+    });
+
+    it("does not allow moving over own pieces", () => {
+      expectMoves({
+        pieceCoord: "d4",
+        board: `
+          8 . . . . . . . .
+          7 . . . . . . . .
+          6 . ♙ . . . ♙ . .
+          5 . . . . . . . .
+          4 . . . ♗ . . . .
+          3 . . . . . . . .
+          2 . ♙ . . . ♙ . .
+          1 . . . . . . . .
+            a b c d e f g h
+        `,
+        expectedBoard: `
+          8 . . . . . . . .
+          7 . . . . . . . .
+          6 . ♙ . . . ♙ . .
+          5 . . x . x . . .
+          4 . . . ♗ . . . .
+          3 . . x . x . . .
+          2 . ♙ . . . ♙ . .
           1 . . . . . . . .
             a b c d e f g h
         `,
