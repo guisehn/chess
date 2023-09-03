@@ -337,6 +337,92 @@ describe("calculatePossibleMoves", () => {
       });
     });
   });
+
+  describe("hook", () => {
+    it("calculates moves correctly", () => {
+      expectMoves({
+        pieceCoord: "d4",
+        board: `
+          8 . . . . . . . .
+          7 . . . . . . . .
+          6 . . . . . . . .
+          5 . . . . . . . .
+          4 . . . ♖ . . . .
+          3 . . . . . . . .
+          2 . . . . . . . .
+          1 . . . . . . . .
+            a b c d e f g h
+        `,
+        expectedBoard: `
+          8 . . . x . . . .
+          7 . . . x . . . .
+          6 . . . x . . . .
+          5 . . . x . . . .
+          4 x x x ♖ x x x x
+          3 . . . x . . . .
+          2 . . . x . . . .
+          1 . . . x . . . .
+            a b c d e f g h
+        `,
+      });
+    });
+
+    it("allows moving over opponent pieces", () => {
+      expectMoves({
+        pieceCoord: "d4",
+        board: `
+          8 . . . . . . . .
+          7 . . . . . . . .
+          6 . . . ♟ . . . .
+          5 . . . . . . . .
+          4 . ♟ . ♖ . ♟ . .
+          3 . . . . . . . .
+          2 . . . ♟ . . . .
+          1 . . . . . . . .
+            a b c d e f g h
+        `,
+        expectedBoard: `
+          8 . . . . . . . .
+          7 . . . . . . . .
+          6 . . . x . . . .
+          5 . . . x . . . .
+          4 . x x ♖ x x . .
+          3 . . . x . . . .
+          2 . . . x . . . .
+          1 . . . . . . . .
+            a b c d e f g h
+        `,
+      });
+    });
+
+    it("does not allow moving over own pieces", () => {
+      expectMoves({
+        pieceCoord: "d4",
+        board: `
+          8 . . . . . . . .
+          7 . . . . . . . .
+          6 . . . ♙ . . . .
+          5 . . . . . . . .
+          4 . ♙ . ♖ . ♙ . .
+          3 . . . . . . . .
+          2 . . . ♙ . . . .
+          1 . . . . . . . .
+            a b c d e f g h
+        `,
+        expectedBoard: `
+          8 . . . . . . . .
+          7 . . . . . . . .
+          6 . . . ♙ . . . .
+          5 . . . x . . . .
+          4 . ♙ x ♖ x ♙ . .
+          3 . . . x . . . .
+          2 . . . ♙ . . . .
+          1 . . . . . . . .
+            a b c d e f g h
+        `,
+      });
+    });
+  });
 });
 
 function boardToState(board: Board, options?: Partial<GameState>): GameState {
