@@ -250,6 +250,8 @@ describe("calculatePossibleMoves", () => {
         });
       });
     });
+
+    // TODO: white
   });
 
   describe("knight", () => {
@@ -509,6 +511,96 @@ describe("calculatePossibleMoves", () => {
       });
     });
   });
+
+  describe("queen", () => {
+    it("calculates moves correctly", () => {
+      expectMoves({
+        pieceCoord: "d4",
+        board: `
+          8 . . . . . . . .
+          7 . . . . . . . .
+          6 . . . . . . . .
+          5 . . . . . . . .
+          4 . . . ♕ . . . .
+          3 . . . . . . . .
+          2 . . . . . . . .
+          1 . . . . . . . .
+            a b c d e f g h
+        `,
+        expectedBoard: `
+          8 . . . x . . . x
+          7 x . . x . . x .
+          6 . x . x . x . .
+          5 . . x x x . . .
+          4 x x x ♕ x x x x
+          3 . . x x x . . .
+          2 . x . x . x . .
+          1 x . . x . . x .
+            a b c d e f g h
+        `,
+      });
+    });
+
+    it("allows moving over opponent pieces", () => {
+      expectMoves({
+        pieceCoord: "d4",
+        board: `
+          8 . . . . . . . .
+          7 . . . . . . . .
+          6 . ♟ . ♟ . ♟ . .
+          5 . . . . . . . .
+          4 . ♟ . ♕ . ♟ . .
+          3 . . . . . . . .
+          2 . ♟ . ♟ . ♟ . .
+          1 . . . . . . . .
+            a b c d e f g h
+        `,
+        expectedBoard: `
+          8 . . . . . . . .
+          7 . . . . . . . .
+          6 . x . x . x . .
+          5 . . x x x . . .
+          4 . x x ♕ x x . .
+          3 . . x x x . . .
+          2 . x . x . x . .
+          1 . . . . . . . .
+            a b c d e f g h
+        `,
+      });
+    });
+
+    it("does not allow moving over own pieces", () => {
+      expectMoves({
+        pieceCoord: "d4",
+        board: `
+          8 . . . . . . . .
+          7 . . . . . . . .
+          6 . ♙ . ♙ . ♙ . .
+          5 . . . . . . . .
+          4 . ♙ . ♕ . ♙ . .
+          3 . . . . . . . .
+          2 . ♙ . ♙ . ♙ . .
+          1 . . . . . . . .
+            a b c d e f g h
+        `,
+        expectedBoard: `
+          8 . . . . . . . .
+          7 . . . . . . . .
+          6 . ♙ . ♙ . ♙ . .
+          5 . . x x x . . .
+          4 . ♙ x ♕ x ♙ . .
+          3 . . x x x . . .
+          2 . ♙ . ♙ . ♙ . .
+          1 . . . . . . . .
+            a b c d e f g h
+        `,
+      });
+    });
+  });
+
+  // TODO: king
+
+  // TODO: preventCheck option
 });
 
 function boardToState(board: Board, options?: Partial<GameState>): GameState {
