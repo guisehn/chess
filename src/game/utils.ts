@@ -1,21 +1,67 @@
-import {
-  Board,
-  Coordinate,
-  CoordinateString,
-  GameState,
-  Piece,
-  PieceChar,
-} from "./types";
+import { Board, Coordinate, CoordinateString, Piece, PieceChar } from "./types";
 
-const makeId = (() => {
+export function buildIdGenerator() {
   let n = 0;
-  return () => {
-    return "p" + ++n;
-  };
-})();
+  return () => "p" + ++n;
+}
 
-export function makePiece(piece: Omit<Piece, "id" | "moved">): Piece {
-  return { ...piece, moved: false, id: makeId() };
+const idGenerator = buildIdGenerator();
+
+export function makePiece(
+  piece: Omit<Piece, "id" | "moved"> & { id?: string }
+): Piece {
+  return { ...piece, moved: false, id: piece.id ?? idGenerator() };
+}
+
+export function stringToBoard(
+  str: string,
+  generateId: () => string = idGenerator
+): Board {
+  const board: Board = [];
+  const lines = str.trim().split("\n");
+
+  for (let y = 0; y < 8; y++) {
+    const row: (Piece | null)[] = [];
+    const line = (lines[y] ?? "").trim().split(" ");
+
+    for (let x = 1; x <= 8; x++) {
+      let id;
+      if (line[x] !== ".") id = generateId();
+      row.push(charToPiece(line[x] as PieceChar | ".", id));
+    }
+
+    board.push(row);
+  }
+
+  return board;
+}
+
+export function boardToString(
+  board: Board,
+  highlightCoordinates?: Coordinate[]
+) {
+  return (
+    board
+      .map((row, y) => {
+        const line = row
+          .map((value, x) => {
+            if (
+              highlightCoordinates &&
+              hasCoordinate(highlightCoordinates, { x, y })
+            ) {
+              return "x";
+            }
+
+            if (!value) return ".";
+
+            return pieceToChar(value);
+          })
+          .join(" ");
+
+        return `${8 - y} ${line}`;
+      })
+      .join("\n") + "\n  a b c d e f g h"
+  );
 }
 
 export function isSameCoordinate(c1: Coordinate, c2: Coordinate) {
@@ -63,72 +109,34 @@ export function simulateMove(board: Board, from: Coordinate, to: Coordinate) {
   return board;
 }
 
-export function stateToBoardString(state: GameState) {
-  return (
-    state.board
-      .map((row, y) => {
-        const line = row
-          .map((value, x) => {
-            if (hasCoordinate(state.possibleMoves, { x, y })) return "x";
-
-            if (!value) return ".";
-
-            return pieceToChar(value);
-          })
-          .join(" ");
-
-        return `${8 - y} ${line}`;
-      })
-      .join("\n") + "\n  a b c d e f g h"
-  );
-}
-
-export function stringToBoard(str: string): Board {
-  const board: Board = [];
-  const lines = str.trim().split("\n");
-
-  for (let y = 0; y < 8; y++) {
-    const row: (Piece | null)[] = [];
-    const line = (lines[y] ?? "").trim().split(" ");
-
-    for (let x = 1; x <= 8; x++) {
-      row.push(charToPiece((line[x] || ".") as PieceChar | "."));
-    }
-
-    board.push(row);
-  }
-
-  return board;
-}
-
-function charToPiece(char: PieceChar | "."): Piece | null {
+function charToPiece(char: PieceChar | ".", id?: string): Piece | null {
   switch (char) {
     case ".":
       return null;
     case "♗":
-      return makePiece({ type: "bishop", color: "white" });
+      return makePiece({ type: "bishop", color: "white", id });
     case "♝":
-      return makePiece({ type: "bishop", color: "black" });
+      return makePiece({ type: "bishop", color: "black", id });
     case "♚":
-      return makePiece({ type: "king", color: "black" });
+      return makePiece({ type: "king", color: "black", id });
     case "♔":
-      return makePiece({ type: "king", color: "white" });
+      return makePiece({ type: "king", color: "white", id });
     case "♞":
-      return makePiece({ type: "knight", color: "black" });
+      return makePiece({ type: "knight", color: "black", id });
     case "♘":
-      return makePiece({ type: "knight", color: "white" });
+      return makePiece({ type: "knight", color: "white", id });
     case "♟":
-      return makePiece({ type: "pawn", color: "black" });
+      return makePiece({ type: "pawn", color: "black", id });
     case "♙":
-      return makePiece({ type: "pawn", color: "white" });
+      return makePiece({ type: "pawn", color: "white", id });
     case "♛":
-      return makePiece({ type: "queen", color: "black" });
+      return makePiece({ type: "queen", color: "black", id });
     case "♕":
-      return makePiece({ type: "queen", color: "white" });
+      return makePiece({ type: "queen", color: "white", id });
     case "♜":
-      return makePiece({ type: "rook", color: "black" });
+      return makePiece({ type: "rook", color: "black", id });
     case "♖":
-      return makePiece({ type: "rook", color: "white" });
+      return makePiece({ type: "rook", color: "white", id });
     default:
       throw new Error(`Unexpected char "${char}"`);
   }

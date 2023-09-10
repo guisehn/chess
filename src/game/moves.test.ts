@@ -1,6 +1,6 @@
 import { calculatePossibleMoves } from "./moves";
 import { Board, CoordinateString, GameState, LogEntry } from "./types";
-import { stateToBoardString, stringToBoard, stringToCoord } from "./utils";
+import { boardToString, stringToBoard, stringToCoord } from "./utils";
 
 describe("calculatePossibleMoves", () => {
   describe("pawn", () => {
@@ -642,5 +642,7 @@ function expectMoves({
     .map((line, y) => (y === 8 ? `  ${line.trim()}` : line.trim()))
     .join("\n");
 
-  expect(stateToBoardString(state)).toEqual(expectedBoardString.trim());
+  expect(boardToString(state.board, state.possibleMoves)).toEqual(
+    expectedBoardString.trim()
+  );
 }
