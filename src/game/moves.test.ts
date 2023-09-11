@@ -379,24 +379,24 @@ describe("calculatePossibleMoves", () => {
         pieceCoord: "d4",
         board: `
           8 . . . . . . . .
-          7 . . . . . . . .
+          7 . . . ♟ . . . .
           6 . . . ♟ . . . .
           5 . . . . . . . .
-          4 . ♟ . ♖ . ♟ . .
+          4 ♟ ♟ . ♖ . ♟ ♟ .
           3 . . . . . . . .
           2 . . . ♟ . . . .
-          1 . . . . . . . .
+          1 . . . ♟ . . . .
             a b c d e f g h
         `,
         expectedBoard: `
           8 . . . . . . . .
-          7 . . . . . . . .
+          7 . . . ♟ . . . .
           6 . . . x . . . .
           5 . . . x . . . .
-          4 . x x ♖ x x . .
+          4 ♟ x x ♖ x x ♟ .
           3 . . . x . . . .
           2 . . . x . . . .
-          1 . . . . . . . .
+          1 . . . ♟ . . . .
             a b c d e f g h
         `,
       });
@@ -465,24 +465,24 @@ describe("calculatePossibleMoves", () => {
         pieceCoord: "d4",
         board: `
           8 . . . . . . . .
-          7 . . . . . . . .
+          7 ♟ . . . . . ♟ .
           6 . ♟ . . . ♟ . .
           5 . . . . . . . .
           4 . . . ♗ . . . .
           3 . . . . . . . .
           2 . ♟ . . . ♟ . .
-          1 . . . . . . . .
+          1 ♟ . . . . . ♟ .
             a b c d e f g h
         `,
         expectedBoard: `
           8 . . . . . . . .
-          7 . . . . . . . .
+          7 ♟ . . . . . ♟ .
           6 . x . . . x . .
           5 . . x . x . . .
           4 . . . ♗ . . . .
           3 . . x . x . . .
           2 . x . . . x . .
-          1 . . . . . . . .
+          1 ♟ . . . . . ♟ .
             a b c d e f g h
         `,
       });
@@ -1072,6 +1072,7 @@ function boardToState(board: Board, options?: Partial<GameState>): GameState {
     currentPlayer: "white",
     log: [],
     possibleMoves: [],
+    isPromotingPawn: false,
     selectedPiece: null,
     winner: null,
     ...options,

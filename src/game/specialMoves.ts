@@ -1,18 +1,17 @@
-import { Board, Color, Move } from "./types";
+import { Board, Color, GameState, Move } from "./types";
 
-export function maybeHandleSpecialMove(
-  board: Board,
-  move: Move,
-  currentPlayer: Color
-) {
+export function maybeHandleSpecialMove(state: GameState, move: Move) {
   switch (move.specialMove) {
     case "castling":
-      handleCastling(board, move);
+      handleCastling(state.board, move);
       break;
 
     case "en_passant":
-      handleEnPassant(board, move, currentPlayer);
+      handleEnPassant(state.board, move, state.currentPlayer);
       break;
+
+    case "pawn_promote":
+      state.isPromotingPawn = true;
   }
 }
 

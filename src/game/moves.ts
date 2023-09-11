@@ -82,10 +82,17 @@ function calculatePawnMoves(
 ) {
   const moves: Move[] = [];
 
-  if (color === "white") {
-    if (board[y - 1][x] === null) moves.push({ x, y: y - 1 });
+  if (color === "white" && y > 0) {
+    if (board[y - 1][x] === null) {
+      const reachedEnd = y - 1 === 0;
+      moves.push({
+        x,
+        y: y - 1,
+        specialMove: reachedEnd ? "pawn_promote" : undefined,
+      });
+    }
 
-    // jogada inicial (2)
+    // first play (2 tiles)
     if (y === 6 && board[y - 1][x] === null && board[y - 2][x] === null) {
       moves.push({ x, y: y - 2 });
     }
@@ -120,12 +127,17 @@ function calculatePawnMoves(
         }
       }
     }
-  } else {
-    if (board[y + 1][x] === null) {
-      moves.push({ x, y: y + 1 });
+  } else if (color === "black" && y < 7) {
+    if (y < 7 && board[y + 1][x] === null) {
+      const reachedEnd = y + 1 === 7;
+      moves.push({
+        x,
+        y: y + 1,
+        specialMove: reachedEnd ? "pawn_promote" : undefined,
+      });
     }
 
-    // jogada inicial (2)
+    // first play (2 tiles)
     if (y === 1 && board[y + 1][x] === null && board[y + 2][x] === null) {
       moves.push({ x, y: y + 2 });
     }
@@ -208,13 +220,13 @@ function calculateRookMoves(board: Board, { x, y }: Coordinate, color: Color) {
   for (let xx = x + 1; xx <= 7; xx++) {
     if (board[y][xx]?.color === color) break;
     moves.push({ x: xx, y });
-    if (board[y][xx] && board[x][xx]?.color !== color) break;
+    if (board[y][xx] && board[y][xx]?.color !== color) break;
   }
 
   for (let xx = x - 1; xx >= 0; xx--) {
     if (board[y][xx]?.color === color) break;
     moves.push({ x: xx, y });
-    if (board[y][xx] && board[x][xx]?.color !== color) break;
+    if (board[y][xx] && board[y][xx]?.color !== color) break;
   }
 
   return moves;

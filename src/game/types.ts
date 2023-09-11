@@ -1,8 +1,16 @@
 export type Color = "black" | "white";
 
+export type PieceType =
+  | "rook"
+  | "knight"
+  | "bishop"
+  | "pawn"
+  | "queen"
+  | "king";
+
 export interface Piece {
-  id: string;
-  type: "rook" | "knight" | "bishop" | "pawn" | "queen" | "king";
+  id?: string;
+  type: PieceType;
   color: Color;
   moved: boolean;
 }
@@ -29,6 +37,7 @@ export interface GameState {
   currentPlayer: Color;
   winner: Color | null;
   selectedPiece: Coordinate | null;
+  isPromotingPawn: boolean;
   possibleMoves: Coordinate[];
   log: LogEntry[];
 }
@@ -38,7 +47,9 @@ export interface LogEntry {
   to: Coordinate;
 }
 
-export type Move = Coordinate & { specialMove?: "castling" | "en_passant" };
+export type Move = Coordinate & {
+  specialMove?: "castling" | "en_passant" | "pawn_promote";
+};
 
 export type PieceChar =
   | "♗"

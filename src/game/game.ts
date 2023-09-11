@@ -6,7 +6,14 @@ import { maybeHandleSpecialMove } from "./specialMoves";
 import { isCheckMate } from "./check";
 import { useReducer } from "react";
 
-export type GameAction = { type: "CLICK_TILE"; coord: Coordinate };
+type ClickTileAction = { type: "CLICK_TILE"; coord: Coordinate };
+
+type PromotePawnAction = {
+  type: "PROMOTE_PAWN";
+  to: "queen" | "rook" | "bishop" | "knight";
+};
+
+export type GameAction = ClickTileAction | PromotePawnAction;
 
 export const useGame = () => useReducer(reducer, null, buildInitialState);
 
@@ -27,6 +34,7 @@ function buildInitialState(): GameState {
     board: initialBoard,
     currentPlayer: "white",
     selectedPiece: null,
+    isPromotingPawn: false,
     winner: null,
     possibleMoves: [],
     log: [],
@@ -38,6 +46,8 @@ function reducer(state: GameState, action: GameAction) {
     switch (action.type) {
       case "CLICK_TILE":
         return tileClicked(state, action.coord);
+      case "PROMOTE_PAWN":
+        return promotePawn(state, action.to);
     }
   });
 }
@@ -48,6 +58,8 @@ function reducer(state: GameState, action: GameAction) {
 // TODO: empate se tiver apenas rei contra rei, empate se tiver apenas cavalo e rei, empate se tiver apenas bispo e rei, empate
 
 function tileClicked(state: GameState, { x, y }: Coordinate) {
+  if (state.isPromotingPawn || state.winner) return;
+
   const piece = state.board[y][x];
 
   if (piece && piece.color === state.currentPlayer) {
@@ -58,6 +70,17 @@ function tileClicked(state: GameState, { x, y }: Coordinate) {
   ) {
     play(state, { x, y });
   }
+}
+
+function promotePawn(state: GameState, type: PromotePawnAction["to"]) {
+  if (!state.isPromotingPawn) return;
+
+  const { x, y } = state.selectedPiece!;
+
+  state.board[y][x]!.type = type;
+  state.isPromotingPawn = false;
+
+  nextRound(state);
 }
 
 function selectPiece(state: GameState, { x, y }: Coordinate) {
@@ -84,20 +107,26 @@ function play(state: GameState, to: Coordinate) {
     isSameCoordinate(move, to)
   ) as Move;
 
-  maybeHandleSpecialMove(state.board, move, state.currentPlayer);
+  maybeHandleSpecialMove(state, move);
 
   state.possibleMoves = [];
-  state.selectedPiece = null;
-
   state.log.push({ from, to });
 
-  if (state.currentPlayer === "white") {
-    state.currentPlayer = "black";
+  if (state.isPromotingPawn) {
+    state.selectedPiece = to;
   } else {
-    state.currentPlayer = "white";
+    nextRound(state);
+  }
+}
+
+function nextRound(state: GameState) {
+  const nextPlayer = state.currentPlayer === "white" ? "black" : "white";
+
+  if (isCheckMate(state.board, nextPlayer)) {
+    state.winner = state.currentPlayer;
+    return;
   }
 
-  if (isCheckMate(state.board, state.currentPlayer)) {
-    state.winner = state.currentPlayer === "white" ? "black" : "white";
-  }
+  state.currentPlayer = nextPlayer;
+  state.selectedPiece = null;
 }
