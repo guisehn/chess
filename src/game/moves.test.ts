@@ -1,6 +1,11 @@
 import { calculatePossibleMoves } from "./moves";
 import { Board, CoordinateString, GameState, LogEntry } from "./types";
-import { boardToString, stringToBoard, stringToCoord } from "./utils";
+import {
+  boardToString,
+  getPieceAt,
+  stringToBoard,
+  stringToCoord,
+} from "./utils";
 
 describe("calculatePossibleMoves", () => {
   describe("pawn", () => {
@@ -598,7 +603,465 @@ describe("calculatePossibleMoves", () => {
     });
   });
 
-  // TODO: king
+  describe("king", () => {
+    it("calculates moves correctly", () => {
+      expectMoves({
+        pieceCoord: "d4",
+        board: `
+          8 . . . . . . . .
+          7 . . . . . . . .
+          6 . . . . . . . .
+          5 . . . . . . . .
+          4 . . . ♔ . . . .
+          3 . . . . . . . .
+          2 . . . . . . . .
+          1 . . . . . . . .
+            a b c d e f g h
+        `,
+        expectedBoard: `
+          8 . . . . . . . .
+          7 . . . . . . . .
+          6 . . . . . . . .
+          5 . . x x x . . .
+          4 . . x ♔ x . . .
+          3 . . x x x . . .
+          2 . . . . . . . .
+          1 . . . . . . . .
+            a b c d e f g h
+        `,
+      });
+    });
+
+    it("allows moving over opponent pieces", () => {
+      expectMoves({
+        pieceCoord: "d4",
+        board: `
+          8 . . . . . . . .
+          7 . . . . . . . .
+          6 . . . . . . . .
+          5 . . ♞ ♞ ♞ . . .
+          4 . . ♞ ♔ ♞ . . .
+          3 . . ♞ ♞ ♞ . . .
+          2 . . . . . . . .
+          1 . . . . . . . .
+            a b c d e f g h
+        `,
+        expectedBoard: `
+          8 . . . . . . . .
+          7 . . . . . . . .
+          6 . . . . . . . .
+          5 . . x x x . . .
+          4 . . x ♔ x . . .
+          3 . . x x x . . .
+          2 . . . . . . . .
+          1 . . . . . . . .
+            a b c d e f g h
+        `,
+      });
+    });
+
+    it("does not allow moving over own pieces", () => {
+      expectMoves({
+        pieceCoord: "d4",
+        board: `
+          8 . . . . . . . .
+          7 . . . . . . . .
+          6 . . . . . . . .
+          5 . . ♙ ♙ ♙ . . .
+          4 . . ♙ ♔ ♙ . . .
+          3 . . ♙ ♙ ♙ . . .
+          2 . . . . . . . .
+          1 . . . . . . . .
+            a b c d e f g h
+        `,
+        expectedBoard: `
+          8 . . . . . . . .
+          7 . . . . . . . .
+          6 . . . . . . . .
+          5 . . ♙ ♙ ♙ . . .
+          4 . . ♙ ♔ ♙ . . .
+          3 . . ♙ ♙ ♙ . . .
+          2 . . . . . . . .
+          1 . . . . . . . .
+            a b c d e f g h
+        `,
+      });
+    });
+
+    it("castles left", () => {
+      expectMoves({
+        pieceCoord: "e1",
+        board: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . . .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ . . ♙ ♙ ♙
+            1 ♖ . . . ♔ ♗ . ♖
+              a b c d e f g h
+          `,
+        expectedBoard: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . . .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ x x ♙ ♙ ♙
+            1 ♖ . x x ♔ ♗ . ♖
+              a b c d e f g h
+          `,
+      });
+    });
+
+    describe("invalid left castling", () => {
+      it("does not castle when rook has already moved", () => {
+        expectMoves({
+          pieceCoord: "e1",
+          board: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . . .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ . . ♙ ♙ ♙
+            1 ♖ . . . ♔ ♗ . ♖
+              a b c d e f g h
+          `,
+          expectedBoard: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . . .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ x x ♙ ♙ ♙
+            1 ♖ . . x ♔ ♗ . ♖
+              a b c d e f g h
+          `,
+          modifyBoard(board) {
+            getPieceAt(board, "a1")!.moved = true;
+          },
+        });
+      });
+
+      it("does not castle when king has already moved", () => {
+        expectMoves({
+          pieceCoord: "e1",
+          board: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . . .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ . . ♙ ♙ ♙
+            1 ♖ . . . ♔ ♗ . ♖
+              a b c d e f g h
+          `,
+          expectedBoard: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . . .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ x x ♙ ♙ ♙
+            1 ♖ . . x ♔ ♗ . ♖
+              a b c d e f g h
+          `,
+          modifyBoard(board) {
+            getPieceAt(board, "e1")!.moved = true;
+          },
+        });
+      });
+
+      it("does not castle when king is being checked", () => {
+        expectMoves({
+          pieceCoord: "e1",
+          board: `
+            8 ♜ . . . ♚ . . .
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . ♜ . . .
+            5 . . . . . . . .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ . . ♙ ♙ ♙
+            1 ♖ . . . ♔ ♗ . ♖
+              a b c d e f g h
+          `,
+          expectedBoard: `
+            8 ♜ . . . ♚ . . .
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . ♜ . . .
+            5 . . . . . . . .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ x x ♙ ♙ ♙
+            1 ♖ . . x ♔ ♗ . ♖
+              a b c d e f g h
+          `,
+        });
+      });
+
+      it("does not castle when opponent piece threatens to block the path", () => {
+        expectMoves({
+          pieceCoord: "e1",
+          board: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . . ♝
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ . . ♙ ♙ ♙
+            1 ♖ . . . ♔ ♗ . ♖
+              a b c d e f g h
+          `,
+          expectedBoard: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . . ♝
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ x x ♙ ♙ ♙
+            1 ♖ . . x ♔ ♗ . ♖
+              a b c d e f g h
+          `,
+        });
+
+        expectMoves({
+          pieceCoord: "e1",
+          board: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . ♝ .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ . . ♙ ♙ ♙
+            1 ♖ . . . ♔ ♗ . ♖
+              a b c d e f g h
+          `,
+          expectedBoard: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . ♝ .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ x x ♙ ♙ ♙
+            1 ♖ . . x ♔ ♗ . ♖
+              a b c d e f g h
+          `,
+        });
+
+        expectMoves({
+          pieceCoord: "e1",
+          board: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . ♝ . .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ . . . ♙ ♙ ♙
+            1 ♖ . . . ♔ ♗ . ♖
+              a b c d e f g h
+          `,
+          expectedBoard: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . ♝ . .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ . x x ♙ ♙ ♙
+            1 ♖ . . x ♔ ♗ . ♖
+              a b c d e f g h
+          `,
+        });
+      });
+    });
+
+    it("castles right", () => {
+      expectMoves({
+        pieceCoord: "e1",
+        board: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . . .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ . . ♙ ♙ ♙
+            1 ♖ . . ♕ ♔ . . ♖
+              a b c d e f g h
+          `,
+        expectedBoard: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . . .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ x x ♙ ♙ ♙
+            1 ♖ . . ♕ ♔ x x ♖
+              a b c d e f g h
+          `,
+      });
+    });
+
+    describe("invalid right castling", () => {
+      it("does not castle when rook has already moved", () => {
+        expectMoves({
+          pieceCoord: "e1",
+          board: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . . .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ . . ♙ ♙ ♙
+            1 ♖ . . ♕ ♔ . . ♖
+              a b c d e f g h
+          `,
+          expectedBoard: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . . .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ x x ♙ ♙ ♙
+            1 ♖ . . ♕ ♔ x . ♖
+              a b c d e f g h
+          `,
+          modifyBoard(board) {
+            getPieceAt(board, "h1")!.moved = true;
+          },
+        });
+      });
+
+      it("does not castle when king has already moved", () => {
+        expectMoves({
+          pieceCoord: "e1",
+          board: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . . .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ . . ♙ ♙ ♙
+            1 ♖ . . ♕ ♔ . . ♖
+              a b c d e f g h
+          `,
+          expectedBoard: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . . .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ x x ♙ ♙ ♙
+            1 ♖ . . ♕ ♔ x . ♖
+              a b c d e f g h
+          `,
+          modifyBoard(board) {
+            getPieceAt(board, "e1")!.moved = true;
+          },
+        });
+      });
+
+      it("does not castle when king is being checked", () => {
+        expectMoves({
+          pieceCoord: "e1",
+          board: `
+            8 ♜ . . . ♚ . . .
+            7 ♟ ♟ ♟ . ♜ ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . . .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ . . ♙ ♙ ♙
+            1 ♖ . . ♕ ♔ . . ♖
+              a b c d e f g h
+          `,
+          expectedBoard: `
+            8 ♜ . . . ♚ . . .
+            7 ♟ ♟ ♟ . ♜ ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . . .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ x x ♙ ♙ ♙
+            1 ♖ . . ♕ ♔ x . ♖
+              a b c d e f g h
+          `,
+        });
+      });
+
+      it("does not castle when opponent piece threatens to block the path", () => {
+        expectMoves({
+          pieceCoord: "e1",
+          board: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . . .
+            4 . . ♝ . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ . . ♙ ♙ ♙
+            1 ♖ . . ♕ ♔ . . ♖
+              a b c d e f g h
+          `,
+          expectedBoard: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . . .
+            4 . . ♝ . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ x x ♙ ♙ ♙
+            1 ♖ . . ♕ ♔ x . ♖
+              a b c d e f g h
+          `,
+        });
+
+        expectMoves({
+          pieceCoord: "e1",
+          board: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . . .
+            4 . . . ♝ . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ . . . ♙ ♙
+            1 ♖ . . ♕ ♔ . . ♖
+              a b c d e f g h
+          `,
+          expectedBoard: `
+            8 ♜ . . . ♚ . . ♜
+            7 ♟ ♟ ♟ . . ♟ ♟ ♟
+            6 . . . . . . . .
+            5 . . . . . . . .
+            4 . . . ♝ . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ x x x ♙ ♙
+            1 ♖ . . ♕ ♔ x . ♖
+              a b c d e f g h
+          `,
+        });
+      });
+    });
+  });
 
   // TODO: preventCheck option
 });
@@ -620,13 +1083,17 @@ function expectMoves({
   board: boardString,
   expectedBoard: expectedBoardString,
   log,
+  modifyBoard,
 }: {
   pieceCoord: CoordinateString;
   board: string;
   expectedBoard: string;
   log?: LogEntry[];
+  modifyBoard?: (board: Board) => void;
 }) {
   const board = stringToBoard(boardString);
+
+  if (modifyBoard) modifyBoard(board);
 
   const possibleMoves = calculatePossibleMoves(
     board,

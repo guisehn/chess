@@ -280,7 +280,6 @@ function calculateKingMoves(
   moves.push({ x, y: y + 1 });
   moves.push({ x: x + 1, y: y + 1 });
 
-  // TODO: se tiver em check, não pode
   if (!nestedCalculation && !piece.moved) {
     const opponentCoords = findCoordinates(
       ({ x, y }) => board[y][x] !== null && board[y][x]!.color !== piece.color
@@ -301,9 +300,10 @@ function calculateKingMoves(
       !board[y][1] &&
       !board[y][2] &&
       !board[y][3] &&
-      !hasCoordinate(allOpponentMoves, { x: 1, y }) &&
-      !hasCoordinate(allOpponentMoves, { x: 2, y }) &&
-      !hasCoordinate(allOpponentMoves, { x: 3, y })
+      !hasCoordinate(allOpponentMoves, { x: 4, y }) && // check
+      !hasCoordinate(allOpponentMoves, { x: 3, y }) && // left 1
+      !hasCoordinate(allOpponentMoves, { x: 2, y }) && // left 2
+      !hasCoordinate(allOpponentMoves, { x: 1, y }) //    left 3
     ) {
       moves.push({ x: 2, y, specialMove: "castling" });
     }
@@ -316,8 +316,9 @@ function calculateKingMoves(
       !rightRook.moved &&
       !board[y][5] &&
       !board[y][6] &&
-      !hasCoordinate(allOpponentMoves, { x: 5, y }) &&
-      !hasCoordinate(allOpponentMoves, { x: 6, y })
+      !hasCoordinate(allOpponentMoves, { x: 4, y }) && // check
+      !hasCoordinate(allOpponentMoves, { x: 5, y }) && // right 1
+      !hasCoordinate(allOpponentMoves, { x: 6, y }) //    right 2
     ) {
       moves.push({ x: 6, y, specialMove: "castling" });
     }

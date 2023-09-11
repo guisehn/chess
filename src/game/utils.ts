@@ -72,6 +72,11 @@ export function hasCoordinate(list: Coordinate[], coordinate: Coordinate) {
   return list.some((item) => isSameCoordinate(item, coordinate));
 }
 
+export function getPieceAt(board: Board, coordString: CoordinateString) {
+  const { x, y } = stringToCoord(coordString);
+  return board[y][x];
+}
+
 export function findCoordinate(
   predicate: (coord: Coordinate) => boolean
 ): Coordinate | null {
