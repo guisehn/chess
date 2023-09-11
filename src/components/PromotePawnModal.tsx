@@ -17,7 +17,10 @@ export default function PromotePieceModal({
       <h1 className="text-center font-bold text-lg mb-2">Promote pawn</h1>
       <div className="flex gap-4">
         {(["queen", "rook", "bishop", "knight"] as const).map((piece) => (
-          <Button onClick={() => dispatch({ type: "PROMOTE_PAWN", to: piece })}>
+          <Button
+            key={piece}
+            onClick={() => dispatch({ type: "PROMOTE_PAWN", to: piece })}
+          >
             <Piece piece={{ type: piece, color: state.currentPlayer }} />
           </Button>
         ))}

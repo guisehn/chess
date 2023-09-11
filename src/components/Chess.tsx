@@ -20,7 +20,7 @@ export default function Chess() {
         {state.isPromotingPawn && (
           <PromotePawnModal state={state} dispatch={dispatch} />
         )}
-        <pre>{JSON.stringify(state, null, 2)}</pre>
+        {/* <pre>{JSON.stringify(state, null, 2)}</pre> */}
       </div>
     </div>
   );

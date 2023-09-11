@@ -56,9 +56,6 @@ export default function Board({ state, dispatch }: BoardProps) {
                 )}
                 onClick={() => handleTileClick({ x, y })}
               >
-                <div className="absolute top-1 left-1 text-xs opacity-30">
-                  {x},{y}
-                </div>
                 {piece && <Piece piece={piece} viewTransition={true} />}
               </div>
             ))}
