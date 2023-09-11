@@ -1,17 +1,14 @@
 import classNames from "classnames";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { flushSync } from "react-dom";
 
 import Image from "next/image";
-import { Coordinate, GameState, Piece } from "@/game/types";
-import { coordToString, hasCoordinate, isSameCoordinate } from "@/game/utils";
-import { buildInitialState, play } from "@/game/game";
-import { isCheck, isCheckMate } from "@/game/check";
-
-const initialState = buildInitialState();
+import { Coordinate, Piece } from "@/game/types";
+import { hasCoordinate, isSameCoordinate } from "@/game/utils";
+import { useGame } from "@/game/game";
 
 export default function Chess() {
-  const [state, setState] = useState<GameState>(initialState);
+  const [state, dispatch] = useGame();
 
   useEffect(() => {
     if (state.winner) {
@@ -24,7 +21,7 @@ export default function Chess() {
 
     (document as any).startViewTransition(() => {
       flushSync(() => {
-        setState(play(state, { x, y }));
+        dispatch({ type: "CLICK_TILE", coord: { x, y } });
       });
     });
   }

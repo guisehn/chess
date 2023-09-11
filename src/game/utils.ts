@@ -13,10 +13,9 @@ export function makePiece(
   return { ...piece, moved: false, id: piece.id ?? idGenerator() };
 }
 
-export function stringToBoard(
-  str: string,
-  generateId: () => string = idGenerator
-): Board {
+export function stringToBoard(str: string, generateId?: () => string): Board {
+  if (!generateId) generateId = buildIdGenerator();
+
   const board: Board = [];
   const lines = str.trim().split("\n");
 

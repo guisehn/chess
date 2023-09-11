@@ -4,8 +4,13 @@ import { calculatePossibleMoves } from "./moves";
 import { hasCoordinate, isSameCoordinate, stringToBoard } from "./utils";
 import { maybeHandleSpecialMove } from "./specialMoves";
 import { isCheckMate } from "./check";
+import { useReducer } from "react";
 
-export function buildInitialState(): GameState {
+export type GameAction = { type: "CLICK_TILE"; coord: Coordinate };
+
+export const useGame = () => useReducer(reducer, null, buildInitialState);
+
+function buildInitialState(): GameState {
   const initialBoard = stringToBoard(`
     8 ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
     7 ♟ ♟ ♟ ♟ ♟ ♟ ♟ ♟
@@ -28,24 +33,31 @@ export function buildInitialState(): GameState {
   };
 }
 
+function reducer(state: GameState, action: GameAction) {
+  return produce(state, (state) => {
+    switch (action.type) {
+      case "CLICK_TILE":
+        return tileClicked(state, action.coord);
+    }
+  });
+}
+
 // TODO: impedir roque
 // TODO: transformar peão em outra peça quando chega no final do tabuleiro
 // TODO: empate por afogamento
 // TODO: empate se tiver apenas rei contra rei, empate se tiver apenas cavalo e rei, empate se tiver apenas bispo e rei, empate
 
-export function play(state: GameState, { x, y }: Coordinate) {
-  return produce(state, (state) => {
-    const piece = state.board[y][x];
+function tileClicked(state: GameState, { x, y }: Coordinate) {
+  const piece = state.board[y][x];
 
-    if (piece && piece.color === state.currentPlayer) {
-      selectPiece(state, { x, y });
-    } else if (
-      state.selectedPiece &&
-      hasCoordinate(state.possibleMoves, { x, y })
-    ) {
-      doPlay(state, { x, y });
-    }
-  });
+  if (piece && piece.color === state.currentPlayer) {
+    selectPiece(state, { x, y });
+  } else if (
+    state.selectedPiece &&
+    hasCoordinate(state.possibleMoves, { x, y })
+  ) {
+    play(state, { x, y });
+  }
 }
 
 function selectPiece(state: GameState, { x, y }: Coordinate) {
@@ -58,7 +70,7 @@ function selectPiece(state: GameState, { x, y }: Coordinate) {
   );
 }
 
-function doPlay(state: GameState, to: Coordinate) {
+function play(state: GameState, to: Coordinate) {
   if (!state.selectedPiece) return;
 
   const from = state.selectedPiece;
