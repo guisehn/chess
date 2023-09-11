@@ -1,6 +1,5 @@
 import { Dispatch } from "react";
 import { flushSync } from "react-dom";
-import Image from "next/image";
 import classNames from "classnames";
 
 import { GameAction } from "@/game/game";
@@ -15,11 +14,7 @@ interface BoardProps {
 
 export default function Board({ state, dispatch }: BoardProps) {
   function handleTileClick({ x, y }: Coordinate) {
-    (document as any).startViewTransition(() => {
-      flushSync(() => {
-        dispatch({ type: "CLICK_TILE", coord: { x, y } });
-      });
-    });
+    withViewTransition(() => dispatch({ type: "CLICK_TILE", coord: { x, y } }));
   }
 
   return (
@@ -36,29 +31,32 @@ export default function Board({ state, dispatch }: BoardProps) {
             <div className="!bg-white justify-end items-center flex p-4 text-xs">
               {8 - y}
             </div>
-            {row.map((piece, x) => (
-              <div
-                key={x}
-                className={classNames(
-                  "h-20 flex items-center justify-center relative",
-                  {
-                    "!bg-red-500":
-                      state.selectedPiece &&
-                      isSameCoordinate(state.selectedPiece, {
-                        x,
-                        y,
-                      }),
-                    "!bg-green-500": hasCoordinate(state.possibleMoves, {
-                      x,
-                      y,
-                    }),
-                  }
-                )}
-                onClick={() => handleTileClick({ x, y })}
-              >
-                {piece && <Piece piece={piece} viewTransition={true} />}
-              </div>
-            ))}
+            {row.map((piece, x) => {
+              const coord = { x, y };
+
+              return (
+                <div
+                  key={x}
+                  className={"h-20 flex items-center justify-center relative"}
+                  onClick={() => handleTileClick({ x, y })}
+                >
+                  {piece && (
+                    <Piece
+                      piece={piece}
+                      viewTransition={true}
+                      className={classNames({
+                        "scale-125 drop-shadow":
+                          state.selectedPiece &&
+                          isSameCoordinate(state.selectedPiece, coord),
+                      })}
+                    />
+                  )}
+                  {hasCoordinate(state.possibleMoves, coord) && (
+                    <PossibleMove coord={coord} />
+                  )}
+                </div>
+              );
+            })}
           </div>
         ))}
         <div className="grid grid-cols-9 text-xs [&>div]:p-2 [&>div]:text-center">
@@ -75,4 +73,22 @@ export default function Board({ state, dispatch }: BoardProps) {
       </div>
     </div>
   );
+}
+
+function PossibleMove({ coord }: { coord: Coordinate }) {
+  return (
+    <div
+      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-black/30 border-2 border-white rounded-full"
+      style={{
+        contain: "layout",
+        viewTransitionName: `possible-move-${coord.x}-${coord.y}`,
+      }}
+    ></div>
+  );
+}
+
+function withViewTransition(fn: () => any) {
+  (document as any).startViewTransition(() => {
+    flushSync(fn);
+  });
 }
