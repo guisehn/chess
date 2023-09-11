@@ -40,8 +40,6 @@ describe("makePiece", () => {
 
 describe("stringToBoard", () => {
   it("transforms string to board", () => {
-    let generateId = buildIdGenerator();
-
     const initialBoard = stringToBoard(
       `
       8 ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
@@ -53,11 +51,10 @@ describe("stringToBoard", () => {
       2 ♙ ♙ ♙ ♙ ♙ ♙ ♙ ♙
       1 ♖ ♘ ♗ ♕ ♔ ♗ ♘ ♖
         a b c d e f g h
-    `,
-      generateId
+    `
     );
 
-    generateId = buildIdGenerator();
+    const generateId = buildIdGenerator();
 
     expect(initialBoard).toEqual([
       [
