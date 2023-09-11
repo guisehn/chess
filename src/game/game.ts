@@ -1,12 +1,23 @@
 import { produce } from "immer";
 import { Coordinate, GameState, Move } from "./types";
 import { calculatePossibleMoves } from "./moves";
-import { hasCoordinate, isSameCoordinate, simulateMove } from "./utils";
-import { initialBoard } from "./board";
+import { hasCoordinate, isSameCoordinate, stringToBoard } from "./utils";
 import { maybeHandleSpecialMove } from "./specialMoves";
-import { isCheck, isCheckMate } from "./check";
+import { isCheckMate } from "./check";
 
 export function buildInitialState(): GameState {
+  const initialBoard = stringToBoard(`
+    8 ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
+    7 ♟ ♟ ♟ ♟ ♟ ♟ ♟ ♟
+    6 . . . . . . . .
+    5 . . . . . . . .
+    4 . . . . . . . .
+    3 . . . . . . . .
+    2 ♙ ♙ ♙ ♙ ♙ ♙ ♙ ♙
+    1 ♖ ♘ ♗ ♕ ♔ ♗ ♘ ♖
+      a b c d e f g h
+  `);
+
   return {
     board: initialBoard,
     currentPlayer: "white",
