@@ -18,7 +18,7 @@ export default function Board({ state, dispatch }: BoardProps) {
   }
 
   return (
-    <div className="w-screen h-screen flex flex-col items-center justify-center">
+    <div className="w-screen h-screen flex flex-col items-center justify-center select-none">
       <div className="w-[700px]">
         {state.board.map((row, y) => (
           <div
