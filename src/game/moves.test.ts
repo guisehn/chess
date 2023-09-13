@@ -177,7 +177,7 @@ describe("calculatePossibleMoves", () => {
             6 . . . . . . . .
             5 . . . . . . . .
             4 . . ♙ ♟ . . . .
-            3 ♙ . x x . . . ♙
+            3 ♙ . e x . . . ♙
             2 . ♙ . ♙ ♙ ♙ ♙ .
             1 ♖ ♘ ♗ ♕ ♔ ♗ ♘ ♖
               a b c d e f g h
@@ -212,7 +212,7 @@ describe("calculatePossibleMoves", () => {
             6 . . . . . . . .
             5 . . . . . . . .
             4 . . . ♟ ♙ . . .
-            3 ♙ . . x x . . ♙
+            3 ♙ . . x e . . ♙
             2 . ♙ ♙ ♙ . ♙ ♙ .
             1 ♖ ♘ ♗ ♕ ♔ ♗ ♘ ♖
               a b c d e f g h
@@ -738,7 +738,7 @@ describe("calculatePossibleMoves", () => {
             4 . . . . . . . .
             3 . . . . . . . .
             2 ♙ ♙ ♙ x x ♙ ♙ ♙
-            1 ♖ . x x ♔ ♗ . ♖
+            1 ♖ . c x ♔ ♗ . ♖
               a b c d e f g h
           `,
       });
@@ -938,7 +938,7 @@ describe("calculatePossibleMoves", () => {
             4 . . . . . . . .
             3 . . . . . . . .
             2 ♙ ♙ ♙ x x ♙ ♙ ♙
-            1 ♖ . . ♕ ♔ x x ♖
+            1 ♖ . . ♕ ♔ x c ♖
               a b c d e f g h
           `,
       });
