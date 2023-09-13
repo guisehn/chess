@@ -255,7 +255,33 @@ describe("calculatePossibleMoves", () => {
         });
       });
 
-      // TODO: promotes when reaching end of board (normal and diagonal)
+      it("promotes when reaching end of board", () => {
+        expectMoves({
+          pieceCoord: "g7",
+          board: `
+            8 ♜ ♞ ♝ ♛ ♚ ♝ . ♜
+            7 ♟ ♟ ♟ ♟ ♟ ♟ ♙ .
+            6 . . . . . . . .
+            5 . . . . . . . .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ ♙ ♙ ♙ . ♙
+            1 ♖ ♘ ♗ ♕ ♔ ♗ ♘ ♖
+              a b c d e f g h
+          `,
+          expectedBoard: `
+            8 ♜ ♞ ♝ ♛ ♚ p p p
+            7 ♟ ♟ ♟ ♟ ♟ ♟ ♙ .
+            6 . . . . . . . .
+            5 . . . . . . . .
+            4 . . . . . . . .
+            3 . . . . . . . .
+            2 ♙ ♙ ♙ ♙ ♙ ♙ . ♙
+            1 ♖ ♘ ♗ ♕ ♔ ♗ ♘ ♖
+              a b c d e f g h
+          `,
+        });
+      });
     });
 
     // TODO: white
