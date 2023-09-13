@@ -19,8 +19,8 @@ export function isCheck(board: Board, color: Color) {
   );
 
   for (const pieceCoord of opponentCoords) {
-    // TODO: preciso passar log entry aqui? só preciso se um en passant pudesse
-    // salvar de um check
+    // TODO: do we need to pass log entries here? it's only necessary if en passant
+    // could save from a check
     const moves = calculatePossibleMoves(board, pieceCoord);
 
     if (hasCoordinate(moves, kingCoord)) {
@@ -39,8 +39,8 @@ export function isCheckMate(board: Board, color: Color) {
   const myCoords = findCoordinates(({ x, y }) => board[y][x]?.color === color);
 
   for (const pieceCoord of myCoords) {
-    // TODO: preciso passar log entry aqui? só preciso se um en passant pudesse
-    // salvar de um check
+    // TODO: do we need to pass log entries here? it's only necessary if en passant
+    // could save from a check
     const moves = calculatePossibleMoves(board, pieceCoord);
 
     for (const move of moves) {

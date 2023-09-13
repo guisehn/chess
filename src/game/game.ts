@@ -52,11 +52,6 @@ function reducer(state: GameState, action: GameAction) {
   });
 }
 
-// TODO: impedir roque
-// TODO: transformar peão em outra peça quando chega no final do tabuleiro
-// TODO: empate por afogamento
-// TODO: empate se tiver apenas rei contra rei, empate se tiver apenas cavalo e rei, empate se tiver apenas bispo e rei, empate
-
 function tileClicked(state: GameState, { x, y }: Coordinate) {
   if (state.isPromotingPawn || state.winner) return;
 
