@@ -84,12 +84,7 @@ function calculatePawnMoves(
 
   if (color === "white" && y > 0) {
     if (board[y - 1][x] === null) {
-      const reachedEnd = y - 1 === 0;
-      moves.push({
-        x,
-        y: y - 1,
-        specialMove: reachedEnd ? "pawn_promote" : undefined,
-      });
+      moves.push({ x, y: y - 1 });
     }
 
     // first play (2 tiles)
@@ -129,12 +124,7 @@ function calculatePawnMoves(
     }
   } else if (color === "black" && y < 7) {
     if (y < 7 && board[y + 1][x] === null) {
-      const reachedEnd = y + 1 === 7;
-      moves.push({
-        x,
-        y: y + 1,
-        specialMove: reachedEnd ? "pawn_promote" : undefined,
-      });
+      moves.push({ x, y: y + 1 });
     }
 
     // first play (2 tiles)
@@ -172,6 +162,11 @@ function calculatePawnMoves(
         }
       }
     }
+  }
+
+  const promoteY = color === "white" ? 0 : 7;
+  for (const move of moves) {
+    if (move.y === promoteY) move.specialMove = "pawn_promote";
   }
 
   return moves;
@@ -339,7 +334,7 @@ function calculateKingMoves(
   // só pode mover se a casa estiver vazia, ou se houver uma peça de outra cor (mata ela)
   return moves.filter(
     (move) =>
-      board[move.y] &&
+      board[move.y]?.[move.x] !== undefined &&
       (board[move.y][move.x] === null ||
         board[move.y][move.x]?.color !== piece.color)
   );
