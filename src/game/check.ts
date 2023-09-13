@@ -19,8 +19,6 @@ export function isCheck(board: Board, color: Color) {
   );
 
   for (const pieceCoord of opponentCoords) {
-    // TODO: do we need to pass log entries here? it's only necessary if en passant
-    // could save from a check
     const moves = calculatePossibleMoves(board, pieceCoord);
 
     if (hasCoordinate(moves, kingCoord)) {
