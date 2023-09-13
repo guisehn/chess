@@ -1,4 +1,11 @@
-import { Board, Coordinate, CoordinateString, Piece, PieceChar } from "./types";
+import {
+  Board,
+  Coordinate,
+  CoordinateString,
+  Move,
+  Piece,
+  PieceChar,
+} from "./types";
 
 export function buildIdGenerator() {
   let n = 0;
@@ -35,20 +42,27 @@ export function stringToBoard(str: string, generateId?: () => string): Board {
   return board;
 }
 
-export function boardToString(
-  board: Board,
-  highlightCoordinates?: Coordinate[]
-) {
+export function boardToString(board: Board, highlightMoves?: Move[]) {
   return (
     board
       .map((row, y) => {
         const line = row
           .map((value, x) => {
-            if (
-              highlightCoordinates &&
-              hasCoordinate(highlightCoordinates, { x, y })
-            ) {
-              return "x";
+            if (highlightMoves && hasCoordinate(highlightMoves, { x, y })) {
+              const move = highlightMoves.find((move) =>
+                isSameCoordinate(move, { x, y })
+              )!;
+
+              switch (move.specialMove) {
+                case "castling":
+                  return "c";
+                case "en_passant":
+                  return "e";
+                case "pawn_promote":
+                  return "p";
+                default:
+                  return "x";
+              }
             }
 
             if (!value) return ".";
@@ -104,6 +118,10 @@ export function findCoordinates(
   }
 
   return coordinates;
+}
+
+export function isValidCoordinate({ x, y }: Coordinate) {
+  return x >= 0 && x < 8 && y >= 0 && y < 8;
 }
 
 export function simulateMove(board: Board, from: Coordinate, to: Coordinate) {

@@ -254,6 +254,8 @@ describe("calculatePossibleMoves", () => {
           `,
         });
       });
+
+      // TODO: promotes when reaching end of board (normal and diagonal)
     });
 
     // TODO: white

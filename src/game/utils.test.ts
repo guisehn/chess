@@ -191,6 +191,27 @@ describe("boardToString", () => {
   a b c d e f g h`.trim()
     );
   });
+
+  it("highlights special moves", () => {
+    const str = boardToString(board, [
+      { x: 3, y: 3, specialMove: "en_passant" },
+      { x: 4, y: 3, specialMove: "castling" },
+      { x: 4, y: 4, specialMove: "pawn_promote" },
+    ]);
+
+    expect(str).toEqual(
+      `
+8 ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
+7 ♟ ♟ ♟ ♟ ♟ ♟ ♟ ♟
+6 . . . . . . . .
+5 . . . e c . . .
+4 . . . . p . . .
+3 . . . . . . . .
+2 ♙ ♙ ♙ ♙ ♙ ♙ ♙ ♙
+1 ♖ ♘ ♗ ♕ ♔ ♗ ♘ ♖
+  a b c d e f g h`.trim()
+    );
+  });
 });
 
 describe("coordToString", () => {

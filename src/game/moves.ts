@@ -1,6 +1,11 @@
 import { isCheck } from "./check";
 import { Board, Color, Coordinate, LogEntry, Move, Piece } from "./types";
-import { findCoordinates, hasCoordinate, simulateMove } from "./utils";
+import {
+  isValidCoordinate,
+  findCoordinates,
+  hasCoordinate,
+  simulateMove,
+} from "./utils";
 
 /**
  * Calculate possible moves for a piece on the board.
@@ -192,7 +197,7 @@ function calculateKnightMoves(
   // só pode mover se a casa estiver vazia, ou se houver uma peça de outra cor (mata ela)
   return moves.filter(
     (move) =>
-      board[move.y] &&
+      isValidCoordinate(move) &&
       (board[move.y][move.x] === null || board[move.y][move.x]?.color !== color)
   );
 }
@@ -334,7 +339,7 @@ function calculateKingMoves(
   // só pode mover se a casa estiver vazia, ou se houver uma peça de outra cor (mata ela)
   return moves.filter(
     (move) =>
-      board[move.y]?.[move.x] !== undefined &&
+      isValidCoordinate(move) &&
       (board[move.y][move.x] === null ||
         board[move.y][move.x]?.color !== piece.color)
   );
